@@ -15,6 +15,7 @@
 
   let accessToken:string;
   let profileData:UserProfile;
+  let topSongsData:JSON;
 
   async function getAccessToken() {
     let params = new URLSearchParams(window.location.search);
@@ -46,7 +47,14 @@
   }
 
   async function fetchTopSongs() {
-    
+    if (accessToken) {
+      topSongsData = await auth.fetchTopSongs(accessToken)
+      console.log(topSongsData)
+    }
+
+    else {
+      alert("NO ACCESS TOKEN")
+    }
   }
 
 </script>
@@ -59,9 +67,13 @@
     Access Token: {accessToken}
   </p>
   
-  <p class=".json buddy">
+  <p class="json-display">
     Profile Data: {JSON.stringify(profileData,null,4)}
   </p>
+  <p class="json-display">
+    Favorite Songs: {JSON.stringify(topSongsData,null,4)}
+  </p>
+
   <!-- <ul>
     <li>Display Name: </li>
     <li>User ID: </li>

@@ -1,7 +1,7 @@
 
 //most of the code provided by spotify API documentation tutorial
 
-export interface UserProfile {
+export interface UserProfile{
   country: string;
   display_name: string;
   email: string;
@@ -56,13 +56,13 @@ async function generateCodeChallenge(codeVerifier:string) {
 
 import { clientId, redirectUri } from "./env_vars";
 
+let scope = 'user-read-private user-read-email user-top-read';
 export function requestUserAuthentication() {
   let codeVerifier = generateRandomString(128);
 
   generateCodeChallenge(codeVerifier)
   .then(codeChallenge => {
     let state = generateRandomString(16);
-    let scope = 'user-read-private user-read-email';
 
     localStorage.setItem('code_verifier', codeVerifier);
 
@@ -128,10 +128,14 @@ export async function fetchProfileOld(token: string) {
 }
 
 
+//TODO FIGURE OUT TYPESCRIPTS RELATION TO JSON WEB APIS EXPECTED STRUCTURE STUFF
 async function fetchDataFromSpotifyApi(
   token:string, 
-  endpoint:string, method:string, body:string=""
-): Promise<JSON> {
+  endpoint:string, method:string, body=undefined
+)/*: Promise<JSON>*/ {
+  
+  console.log(`Fetching https://api.spotify.com/${endpoint}`)
+  
   const res = await fetch(`https://api.spotify.com/${endpoint}`, {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -140,30 +144,47 @@ async function fetchDataFromSpotifyApi(
     body:JSON.stringify(body)
   });
   return await res.json();
+
+
+  //TODO ERROR HANDLING / promise.reject maybe todo
 }
 
 
 export async function fetchProfile(token: string): Promise<UserProfile> {
+  
+  const x = await (fetchDataFromSpotifyApi(token, `v1/me`, "GET" ))
+
+  return x;
+  
+  
+  
   //TODO double Check this is the same
-  return fetch(
-    "https://api.spotify.com/v1/me", 
-    {
-      method: "GET", 
-      headers: { Authorization: `Bearer ${token}` }
-    }
-  )
-  .then ((result) => {
-    return result.json();
-  })
-  .catch((error)=> {
-    console.error(error)
-    throw "Couldn't Fetch Profile"
-  })
+  // return fetch(
+  //   "https://api.spotify.com/v1/me", 
+  //   {
+  //     method: "GET", 
+  //     headers: { Authorization: `Bearer ${token}` }
+  //   }
+  // )
+  // .then ((result) => {
+  //   return result.json();
+  // })
+  // .catch((error)=> {
+  //   console.error(error)
+  //   throw "Couldn't Fetch Profile"
+  // })
 }
 
 export async function fetchTopSongs(token:string) {
-  const x = await fetchDataFromSpotifyApi(token, "/v1/me", "GET" );
-  return x
+  
+  let args = new URLSearchParams({
+    time_range: "long_term",
+    limit: "3"
+  });
+  
+  const x = await fetchDataFromSpotifyApi(token, `v1/me/top/tracks?${args}`, "GET" );
+  
+  return x;
 }
 
 async function test(token:string) {

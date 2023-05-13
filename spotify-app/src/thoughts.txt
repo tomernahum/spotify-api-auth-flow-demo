@@ -1,0 +1,12 @@
+
+
+
+- I don't understand the PKCE thing fully, why can an attacker intercept incoming requests to the client but not outgoing requests, the model seems to protect against a scenario like that only
+
+
+- I don't understand the point of the 1 hour expiring auth token and non-expiring refresh token.
+One way you could code it is just to get a new auth token with the refresh token every time you want to use the auth token (you'd have to make 2 requests). If thats the case why can't spotify do that on their servers and just have a non expiring auth token?
+
+Maybe its for security, like you keep the refresh token more secure than the auth token since it can be used forever (replacing its own value but still). 
+Right maybe you could get the expiring auth token on your server and send it down to the client, but not send the refresh token down to the client, because the client is unsecure I guess. Doesn't really apply in my 
+
