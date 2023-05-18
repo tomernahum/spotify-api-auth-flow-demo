@@ -1,0 +1,23 @@
+
+
+Done:
+    - make a dummy app to understand API
+TODO:
+    - learn how web apis work with typescript    - should i use something like tanstack query or that other library
+    - make an actual app that does something
+
+TODO also:
+    - understand why PKCE protects against attacks
+    - understand what is supposed to be secret or what attacks are possible 
+    (for instance couldn't someone impersonate my app if they have my clientID? So does that mean everything should go through my own server? - actually this is impossible because client id is user auth page)
+    
+    No because the actual code is sent to my url by spotify itself, the code path should be handled by my backend secretly not by my frontend (i'm guessing), though spotify still does otherwise in their tutorial...
+    wait no because spotify redirects the actual client to that URL, it's in the url bar for the client
+    bottom of this url says its only way to verify identity: https://www.oauth.com/oauth2-servers/single-page-apps/#authorization
+    except call me crazy but if you are a malicious client you could just use your own browser and copy paste the code from the URL, that part is not done on the backend. (then continue everything else on your fake client) So if this were a paid API they could run up my bill no?? I guess they could anyway?
+
+
+Things backend needs to handle i think:
+    - "code" that is used for getting initial access token
+    - maybe access token and refresh token itself
+    - which makes it really complicated and not a client side spa at that point...

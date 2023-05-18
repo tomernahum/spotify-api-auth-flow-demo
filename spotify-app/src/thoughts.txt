@@ -10,3 +10,6 @@ One way you could code it is just to get a new auth token with the refresh token
 Maybe its for security, like you keep the refresh token more secure than the auth token since it can be used forever (replacing its own value but still). 
 Right maybe you could get the expiring auth token on your server and send it down to the client, but not send the refresh token down to the client, because the client is unsecure I guess. Doesn't really apply in my 
 
+
+
+BTW I am pretty sure this is insecure even though spotify reccomended it. Something about this needs to be secret otherwise someone else could just copy my code from github and run up my API bill if there was one

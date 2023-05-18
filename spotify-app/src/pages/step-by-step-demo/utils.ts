@@ -1,7 +1,7 @@
 
 //most of the code provided by spotify API documentation tutorial
 
-export interface UserProfile{
+export interface UserProfile {
   country: string;
   display_name: string;
   email: string;
@@ -54,10 +54,11 @@ async function generateCodeChallenge(codeVerifier:string) {
 
 //-----
 
-import { clientId, redirectUri } from "./env_vars";
+// import { clientId, redirectUri } from "../../env_vars";
+import * as env_vars from "../../env_vars";
 
 let scope = 'user-read-private user-read-email user-top-read';
-export function requestUserAuthentication() {
+export function requestUserAuthentication(clientId=env_vars.clientId) {
   let codeVerifier = generateRandomString(128);
 
   generateCodeChallenge(codeVerifier)
@@ -68,12 +69,12 @@ export function requestUserAuthentication() {
 
     let args = new URLSearchParams({
       response_type: 'code',
-      client_id: clientId,
+      client_id: clientId,   //
       scope: scope,
-      redirect_uri: redirectUri,
-      state: state,
+      redirect_uri: env_vars.redirectUri,  //
+      state: state,  //
       code_challenge_method: 'S256',
-      code_challenge: codeChallenge
+      code_challenge: codeChallenge  //
     }); //this creates a thing like ?v="iwheiwfe"&x="iihfe"
 
     window.location.href = 'https://accounts.spotify.com/authorize?' + args;
@@ -81,14 +82,14 @@ export function requestUserAuthentication() {
 
 }
 
-export async function getAccessToken(clientId: string, code: string): Promise<string> {
+export async function getAccessTokenFromCode(clientId: string, code: string): Promise<any> {
   
-  let codeVerifier = localStorage.getItem('code_verifier');
+  let codeVerifier = localStorage.getItem('code_verifier'); //this is how spotify wrote it. FYI code is used once, code_verifier
 
   let body = new URLSearchParams({
     grant_type: 'authorization_code',
     code: code,
-    redirect_uri: redirectUri,
+    redirect_uri: env_vars.redirectUri,
     client_id: clientId,
     code_verifier: codeVerifier
   });
@@ -104,10 +105,22 @@ export async function getAccessToken(clientId: string, code: string): Promise<st
 
   console.log("Access token response", res)
 
-  return res.access_token;
+  // return res.access_token;
+
+
+  return res;
 
   //now code is invalid fyi
+
+  //Should store in local storage. Not sure if that should be inside or outside the function
 }
+
+
+export async function getAccessTokenFromRefreshToken() {
+
+}
+
+
 
 /*
 
@@ -119,13 +132,14 @@ GetAccessToken()
 
 */
 
-export async function fetchProfileOld(token: string) {
-  const result = await fetch("https://api.spotify.com/v1/me", {
-      method: "GET", headers: { Authorization: `Bearer ${token}` }
-  });
 
-  return await result.json();
-}
+// async function fetchProfileOld(token: string) {
+//   const result = await fetch("https://api.spotify.com/v1/me", {
+//       method: "GET", headers: { Authorization: `Bearer ${token}` }
+//   });
+
+//   return await result.json();
+// }
 
 
 //TODO FIGURE OUT TYPESCRIPTS RELATION TO JSON WEB APIS EXPECTED STRUCTURE STUFF
@@ -182,7 +196,7 @@ export async function fetchTopSongs(token:string) {
     limit: "3"
   });
   
-  const x = await fetchDataFromSpotifyApi(token, `v1/me/top/tracks?${args}`, "GET" );
+  const x = await fetchDataFromSpotifyApi(token, `v1/me/top/tracks?` + args, "GET" );
   
   return x;
 }
@@ -193,53 +207,6 @@ async function test(token:string) {
 }
 
 //TODO LEARN
-
-//---
-import { writable } from "svelte/store";
-
-let authed; //Not used
-let loggedIn = writable(false);
-let profile = writable(null)
-
-export async function onPageLoad() {
-  let params = new URLSearchParams(window.location.search);
-  let code = params.get("code");
-
-
-  /*
-    Expected Param States:
-    1) No params
-    2) code=... &state=...              (after successful requestUserAuthentication)
-    3) error=access_denied &state=...   (after canceled requestUserAuthentication)
-  */
-
-
-
-  if (!code) {
-    authed = false;
-    //Frontend code will allow user to auth, when that happens page will be reloaded with code in URLSearchParams
-  }
-  else {
-    //we just got back from auth page successfully
-    authed = true;
-    
-    try {
-      console.log("Code provided, getting access token,")
-      const accessToken = await getAccessToken(clientId, code);
-      
-      console.log("fetching profile data")
-      
-      const profile_var:UserProfile = await fetchProfile(accessToken) 
-      profile.set(profile_var)
-      console.log("profile:", profile_var)
-
-      loggedIn.set(true)
-    }
-    catch(e) {
-      console.error(e)
-    }
-  }
-}
 
 
 
