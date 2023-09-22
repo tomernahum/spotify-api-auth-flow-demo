@@ -1,3 +1,12 @@
 
-export const clientId = "952db1f2e9ee437fa16202a7fe46cb20"   //not sure if this is secret, I think not, I guess what stops people from impersonating me is the redirectURL
-export const redirectUri = 'http://localhost:5173';
+//not sure clientId is secret, I think not, I guess what stops people from impersonating me is the redirectURL
+
+export const clientId = import.meta.env.VITE_CLIENT_ID ||;  
+export const redirectUri = import.meta.env.VITE_REDIRECT_URI;
+
+if (!clientId) {
+    throw new Error("env.VITE_CLIENT_ID not defined");
+}
+if (!redirectUri) {
+    throw new Error("env.VITE_REDIRECT_URI not defined");
+}
